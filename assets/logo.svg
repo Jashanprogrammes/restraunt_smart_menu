@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2B84B" />
+      <stop offset="100%" stop-color="#D97736" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#161618" stroke="#F2B84B" stroke-width="2" stroke-opacity="0.3"/>
+  <!-- Cloche / Chef Dome & Fork -->
+  <path d="M14 44 h36 a2 2 0 0 1 2 2 v2 a1 1 0 0 1 -1 1 h-38 a1 1 0 0 1 -1 -1 v-2 a2 2 0 0 1 2 -2 z" fill="url(#goldGrad)" />
+  <path d="M18 40 c0 -12 7 -20 14 -20 s14 8 14 20 z" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round" />
+  <circle cx="32" cy="18" r="3.5" fill="url(#goldGrad)" />
+  <path d="M26 31 c2 -4 4 -4 6 0 c2 4 4 4 6 0" fill="none" stroke="#F7F1E8" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+</svg>
