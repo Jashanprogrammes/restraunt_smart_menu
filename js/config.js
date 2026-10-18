@@ -28,6 +28,13 @@ const SAVOR_CONFIG = {
       finish: "Premium Matte Black & Subtle Gold",
       nfcRecordType: "Standard NDEF URI (HTTPS)"
     },
+    upiPayment: {
+      enabled: true,
+      vpa: "savor.dining@upi", // Active restaurant UPI VPA / ID
+      payeeName: "SAVOR Dining",
+      notePrefix: "Table Bill",
+      currency: "INR"
+    },
     serviceNotification: {
       enabled: true,
       primaryMethod: "telegram", // Primary dispatch method: "telegram"

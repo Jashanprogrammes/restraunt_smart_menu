@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Setup Navigation & Smooth Scrolling
   setupNavigation();
 
-  // 4. Setup Share & Table QR Modal
-  setupShareAndQR();
+  // 4. Setup Share & Instant UPI Table Payment
+  setupShareAndUpiPayment();
 
   // 5. Sound toggle in header/nav
   setupHeaderSoundToggle();
@@ -57,9 +57,13 @@ function applyBranding() {
     waiterConfirmed.textContent = isVerified ? conf.tableNumber : 'Your Table';
   }
 
-  const qrTitle = document.getElementById('qr-modal-title') || document.querySelector('.qr-modal-dialog h3');
-  if (qrTitle) {
-    qrTitle.textContent = isVerified ? `Scan To Join ${conf.tableNumber}` : 'Share Digital Menu';
+  const upiTitle = document.getElementById('upi-modal-title');
+  if (upiTitle) {
+    upiTitle.textContent = isVerified ? `Pay ${conf.tableNumber} Bill` : 'Pay Table Bill via UPI';
+  }
+  const upiNote = document.getElementById('upi-note-preview');
+  if (upiNote) {
+    upiNote.textContent = isVerified ? `${conf.tableNumber} Bill` : 'Table Bill';
   }
 
   const footerTableNote = document.getElementById('footer-table-note');
@@ -136,15 +140,123 @@ function setupNavigation() {
   });
 }
 
-function setupShareAndQR() {
+function setupShareAndUpiPayment() {
   const shareBtn = document.getElementById('share-menu-btn');
-  const qrBtn = document.getElementById('show-qr-btn');
-  const qrModal = document.getElementById('share-qr-modal');
-  const qrCloseBtn = document.getElementById('qr-modal-close-btn');
-  const copyLinkBtn = document.getElementById('copy-menu-link-btn');
+  const upiBtn = document.getElementById('show-upi-btn');
+  const upiModal = document.getElementById('upi-pay-modal');
+  const upiCloseBtn = document.getElementById('upi-modal-close-btn');
+  const upiAmountInput = document.getElementById('upi-amount-input');
+  const upiQrContainer = document.getElementById('upi-qr-container');
+  const upiDirectAppBtn = document.getElementById('upi-direct-app-btn');
+  const upiVpaText = document.getElementById('upi-vpa-text');
+  const copyUpiVpaBtn = document.getElementById('copy-upi-vpa-btn');
+  const upiModalTitle = document.getElementById('upi-modal-title');
+  const upiNotePreview = document.getElementById('upi-note-preview');
 
+  const conf = SAVOR_CONFIG.restaurant;
+  const upiConf = conf.upiPayment || {
+    vpa: 'savor.dining@upi',
+    payeeName: conf.name || 'SAVOR Dining',
+    notePrefix: 'Table Bill',
+    currency: 'INR'
+  };
+
+  const isVerified = !!conf.isTokenVerified;
+  const vpa = upiConf.vpa || 'savor.dining@upi';
+  const payee = upiConf.payeeName || conf.name || 'SAVOR Dining';
+
+  if (upiVpaText) upiVpaText.textContent = vpa;
+  if (upiModalTitle) {
+    upiModalTitle.textContent = isVerified ? `Pay ${conf.tableNumber} Bill` : 'Pay Table Bill via UPI';
+  }
+
+  // Build standard UPI URL:
+  // upi://pay?pa=...&pn=...&tn=...&am=...&cu=INR
+  function getUpiDetails(amount) {
+    const note = isVerified
+      ? `${conf.tableNumber} Bill - ${conf.name}`
+      : `Table Bill - ${conf.name}`;
+
+    let url = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent(payee)}&tn=${encodeURIComponent(note)}&cu=INR`;
+    if (amount && !isNaN(amount) && Number(amount) > 0) {
+      url += `&am=${encodeURIComponent(Number(amount).toFixed(2))}`;
+    }
+    return { url, note };
+  }
+
+  // Render QR Code SVG & Update Direct Mobile Link
+  function renderUpiPayment() {
+    const rawAmount = upiAmountInput ? upiAmountInput.value.trim() : '';
+    const { url, note } = getUpiDetails(rawAmount);
+
+    if (upiNotePreview) upiNotePreview.textContent = note;
+
+    if (upiDirectAppBtn) {
+      upiDirectAppBtn.setAttribute('href', url);
+      const btnLabel = document.getElementById('upi-direct-btn-text');
+      if (btnLabel) {
+        if (rawAmount && Number(rawAmount) > 0) {
+          btnLabel.textContent = `Pay ₹${Number(rawAmount).toFixed(0)} in UPI App`;
+        } else {
+          btnLabel.textContent = 'Open in UPI App';
+        }
+      }
+    }
+
+    if (upiQrContainer && window.QRCode && window.QRCode.generateSVG) {
+      try {
+        upiQrContainer.innerHTML = window.QRCode.generateSVG(url, 190, 2);
+      } catch (err) {
+        console.error('Failed to render UPI QR Code:', err);
+      }
+    }
+  }
+
+  // Open UPI Modal
+  upiBtn?.addEventListener('click', () => {
+    if (window.SavorAudio) window.SavorAudio.playTap();
+    renderUpiPayment();
+    upiModal?.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    if (upiAmountInput) upiAmountInput.focus();
+  });
+
+  // Close UPI Modal
+  upiCloseBtn?.addEventListener('click', () => {
+    upiModal?.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  });
+
+  // Backdrop click to close
+  upiModal?.querySelector('.modal-backdrop')?.addEventListener('click', () => {
+    upiModal?.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  });
+
+  // Live amount input updating QR Code & direct mobile link
+  upiAmountInput?.addEventListener('input', () => {
+    renderUpiPayment();
+  });
+
+  // Copy VPA Button
+  copyUpiVpaBtn?.addEventListener('click', () => {
+    if (window.SavorAudio) window.SavorAudio.playTap();
+    copyToClipboard(vpa, 'UPI ID copied to clipboard!');
+  });
+
+  // Shortcut from Call Waiter modal when "Request Bill" is picked
+  const billShortcutBtn = document.getElementById('waiter-pay-upi-shortcut');
+  billShortcutBtn?.addEventListener('click', () => {
+    if (window.SavorAudio) window.SavorAudio.playTap();
+    const waiterModal = document.getElementById('call-waiter-modal');
+    waiterModal?.classList.add('hidden');
+    renderUpiPayment();
+    upiModal?.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  });
+
+  // Web Share API for Share Button
   const getMenuUrl = () => {
-    const conf = SAVOR_CONFIG.restaurant;
     const token = conf.activeToken;
     const base = conf.publicUrl
       ? conf.publicUrl.replace(/\/+$/, '')
@@ -152,15 +264,14 @@ function setupShareAndQR() {
     return token ? `${base}?t=${encodeURIComponent(token)}` : base;
   };
 
-  // Web Share API
   shareBtn?.addEventListener('click', async () => {
     if (window.SavorAudio) window.SavorAudio.playTap();
     const url = getMenuUrl();
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${SAVOR_CONFIG.restaurant.name} Digital Menu & Food Arcade`,
-          text: `Check out the menu and play table mini-games at ${SAVOR_CONFIG.restaurant.name}!`,
+          title: `${conf.name} Digital Menu & Food Arcade`,
+          text: `Check out the menu and play table mini-games at ${conf.name}!`,
           url: url
         });
         return;
@@ -168,47 +279,31 @@ function setupShareAndQR() {
         // Fall back to copy
       }
     }
-    copyToClipboard(url);
+    copyToClipboard(url, 'Menu link copied to clipboard!');
   });
 
-  // Table QR Modal
-  qrBtn?.addEventListener('click', () => {
-    if (window.SavorAudio) window.SavorAudio.playTap();
-    qrModal?.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-  });
-
-  qrCloseBtn?.addEventListener('click', () => {
-    qrModal?.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-  });
-
-  copyLinkBtn?.addEventListener('click', () => {
-    copyToClipboard(getMenuUrl());
-  });
-
-  function copyToClipboard(text) {
+  function copyToClipboard(text, successMsg = 'Copied to clipboard!') {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => {
-        if (window.savorMenu) window.savorMenu.showToast('Menu link copied to clipboard!');
+        if (window.savorMenu) window.savorMenu.showToast(successMsg);
       }).catch(() => {
-        fallbackCopy(text);
+        fallbackCopy(text, successMsg);
       });
     } else {
-      fallbackCopy(text);
+      fallbackCopy(text, successMsg);
     }
   }
 
-  function fallbackCopy(text) {
+  function fallbackCopy(text, successMsg) {
     const input = document.createElement('input');
     input.value = text;
     document.body.appendChild(input);
     input.select();
     try {
       document.execCommand('copy');
-      if (window.savorMenu) window.savorMenu.showToast('Menu link copied to clipboard!');
+      if (window.savorMenu) window.savorMenu.showToast(successMsg);
     } catch (e) {
-      alert(`Menu URL: ${text}`);
+      prompt('Copy to clipboard:', text);
     }
     document.body.removeChild(input);
   }
@@ -312,6 +407,9 @@ function setupCallWaiter() {
     const badgeEl = document.getElementById('waiter-modal-badge');
     if (badgeEl) badgeEl.textContent = isVerified ? `${conf.tableNumber.toUpperCase()} SERVICE` : 'SCAN TABLE PLAQUE';
 
+    const upiShortcutBtn = document.getElementById('waiter-pay-upi-shortcut');
+    if (upiShortcutBtn) upiShortcutBtn.classList.add('hidden');
+
     waiterModal?.classList.remove('hidden');
     document.body.classList.add('modal-open');
   };
@@ -333,11 +431,19 @@ function setupCallWaiter() {
   });
 
   // Reason selection
+  const upiShortcutBtn = document.getElementById('waiter-pay-upi-shortcut');
   reasonBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       reasonBtns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       selectedReason = btn.getAttribute('data-reason') || 'General Assistance';
+      if (upiShortcutBtn) {
+        if (selectedReason.toLowerCase().includes('bill')) {
+          upiShortcutBtn.classList.remove('hidden');
+        } else {
+          upiShortcutBtn.classList.add('hidden');
+        }
+      }
       if (window.SavorAudio) window.SavorAudio.playTap();
     });
   });

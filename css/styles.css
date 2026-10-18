@@ -2789,3 +2789,198 @@ a {
   font-weight: 800;
   margin-bottom: 0.5rem;
 }
+
+/* ==========================================================================
+   INSTANT UPI TABLE PAYMENT (ZERO COMMISSION // DIRECT SETTLEMENT)
+   ========================================================================== */
+.btn-upi-header {
+  border-color: rgba(226, 169, 62, 0.35);
+  color: var(--accent-gold);
+}
+
+.btn-upi-header:hover {
+  background: rgba(226, 169, 62, 0.12);
+  border-color: var(--accent-gold);
+  color: #FFF;
+}
+
+.upi-modal-dialog {
+  max-width: 440px;
+  padding: 2.25rem 1.6rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+@media (max-width: 480px) {
+  .upi-modal-dialog {
+    padding: 1.6rem 1.15rem calc(1.2rem + env(safe-area-inset-bottom, 12px));
+    max-width: 95vw;
+  }
+}
+
+.upi-amount-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0;
+  padding: 0.45rem 0.85rem;
+  margin: 0 auto 1.15rem;
+  max-width: 290px;
+  transition: all var(--transition-fast);
+}
+
+.upi-amount-wrapper:focus-within {
+  border-color: var(--accent-gold);
+  background: rgba(226, 169, 62, 0.06);
+  box-shadow: 0 0 0 1px var(--accent-gold);
+}
+
+.upi-amount-currency {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-right: 0.45rem;
+  line-height: 1;
+}
+
+.upi-amount-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.upi-amount-input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.upi-qr-card {
+  background: #FFFFFF;
+  padding: 1.15rem;
+  display: inline-block;
+  border-radius: 0;
+  border: 2px solid var(--accent-gold);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.upi-qr-svg-holder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upi-qr-svg-holder svg {
+  width: 190px;
+  height: 190px;
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .upi-qr-svg-holder svg {
+    width: 165px;
+    height: 165px;
+  }
+}
+
+.upi-scan-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #12100E;
+  letter-spacing: 0.2px;
+}
+
+.upi-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulseDot 1.8s infinite;
+  display: inline-block;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.upi-direct-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+}
+
+.upi-vpa-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  padding: 0.5rem 0.85rem;
+  border-radius: 0;
+  text-align: left;
+}
+
+.upi-vpa-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.upi-vpa-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.upi-vpa-val {
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: all;
+}
+
+.btn-copy-vpa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(226, 169, 62, 0.12);
+  color: var(--accent-gold);
+  border: 1px solid rgba(226, 169, 62, 0.35);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 0;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy-vpa:hover {
+  background: var(--accent-gold);
+  color: #12100E;
+}
+
+.upi-table-tag-preview {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
