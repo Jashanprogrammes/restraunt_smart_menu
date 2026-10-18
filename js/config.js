@@ -32,8 +32,8 @@ const SAVOR_CONFIG = {
       enabled: true,
       primaryMethod: "telegram", // Primary dispatch method: "telegram"
       telegram: {
-        botToken: "YOUR_TELEGRAM_BOT_TOKEN", // Set in js/config.local.js (gitignored) or localStorage
-        chatId: "YOUR_TELEGRAM_CHAT_ID"     // Set in js/config.local.js (gitignored) or localStorage
+        botToken: "8800551135:AAEsnQH2w4M65RbwLo0beyNVe1K8XRyuKcI", // Active Staff Telegram Bot
+        chatId: "6452025504"                                        // Floor Staff / Admin Chat ID
       },
       spareMethods: {
         ntfyTopic: "savor-table-service-demo", // Spare: Free instant pub-sub push notification fallback
@@ -611,15 +611,6 @@ const SAVOR_CONFIG = {
     "sv-y6u95": { number: 30, label: "Table 30", section: "Rooftop Deck" }
   }
 };
-
-// Merge untracked local credentials if available (e.g. from gitignored js/config.local.js)
-if (typeof window !== 'undefined') {
-  try {
-    if (typeof SAVOR_LOCAL_CONFIG !== 'undefined' && SAVOR_LOCAL_CONFIG.telegram) {
-      Object.assign(SAVOR_CONFIG.restaurant.serviceNotification.telegram, SAVOR_LOCAL_CONFIG.telegram);
-    }
-  } catch (e) { }
-}
 
 // Detect table token from NFC/QR URL (Strictly ?t=... or ?token=...)
 // Plain ?table=04 or invalid numbers are strictly rejected and ignored
